@@ -13,8 +13,8 @@
 
 # ---- Stage 1: build the static site --------------------------------------
 # hugomods/hugo:0.121.2 ships Hugo Extended. This site is a 2021-era Hugo
-# project that still reads .Site.Author.name (deprecated in Hugo 0.124), so
-# the version is pinned below that to keep the template build clean.
+# project, so the version is pinned: the build is clean (no WARN lines) on
+# it. Bump it deliberately and read the build log when you do.
 FROM hugomods/hugo:0.121.2 AS build
 
 # baseURL is a build-time public value, not a secret. Empty default => the

@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 	<meta name="description" content="{{ .Params.description | default .Params.summary }}"> 
-	<meta name="author" content="{{ .Site.Params.author | default .Site.Author.name }}">  
+	<meta name="author" content="{{ .Site.Params.author.name }}">  
 
     <!-- <base href="{{ .Site.BaseURL }}"> -->
     <title>{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }} – {{ .Site.Title }}{{ end }}</title>
