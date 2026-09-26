@@ -1,0 +1,33 @@
+# Version control
+.git
+.gitignore
+
+# Node (only the gh-pages deploy dep lives here; the Hugo build never needs it)
+node_modules
+
+# Hugo build output and caches — the image rebuilds these itself
+public
+resources/_gen
+.hugo_build.lock
+
+# Secrets / local env — never ship these into an image layer
+.env
+.env.*
+
+# PHP data-prep pipeline and its input CSVs. The content/ and data/ they
+# produce are already committed, so the Hugo build does not need them.
+_handling
+
+# Docker + CI files that don't belong inside the build context
+Dockerfile
+.dockerignore
+docker-compose*.yml
+.github
+
+# Editor / OS noise
+.DS_Store
+*.log
+npm-debug.log*
+
+# NOTE: Hugo's data/ directory is build SOURCE (templates read
+# .Site.Data.globalTotals), so it is intentionally NOT ignored here.
