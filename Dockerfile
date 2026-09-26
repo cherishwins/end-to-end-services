@@ -17,9 +17,13 @@
 # it. Bump it deliberately and read the build log when you do.
 FROM hugomods/hugo:0.121.2 AS build
 
-# baseURL is a build-time public value, not a secret. Empty default => the
-# baseURL from config.toml is used as-is. Override for the target domain with:
+# baseURL is a build-time public value, not a secret. Set it for the target
+# domain with (onebox passes https://<E2E_HOST>/):
 #   --build-arg HUGO_BASEURL=https://your.domain/
+# Hugo reads every HUGO_* environment variable as config, and a build arg is
+# in the environment of the RUN below, so an empty HUGO_BASEURL would set
+# baseURL to "" and make og:url, the sitemap and RSS relative. The RUN unsets
+# it when empty, and config.toml's baseURL is used as-is.
 ARG HUGO_BASEURL=""
 
 WORKDIR /src
@@ -29,7 +33,8 @@ COPY . .
 
 # Production build: minified output, garbage-collected resources, no drafts.
 # When HUGO_BASEURL is set it overrides the absolute URLs baked into the HTML.
-RUN hugo --minify --gc --destination /src/public \
+RUN [ -n "$HUGO_BASEURL" ] || unset HUGO_BASEURL; \
+    hugo --minify --gc --destination /src/public \
     ${HUGO_BASEURL:+--baseURL "$HUGO_BASEURL"}
 
 # ---- Stage 2: serve the built site ---------------------------------------
@@ -56,13 +61,12 @@ RUN chown -R nginx:nginx /usr/share/nginx/html
 
 USER nginx
 
-# The container listens on 8080. On the shared host it sits BEHIND Caddy, so
-# publish it to loopback only — never 0.0.0.0 — so it is not reachable on the
-# box's public IP and every request goes through Caddy (TLS, headers, limits).
-# Docker's -p rules bypass host UFW/iptables, so loopback binding is the fix,
-# not a firewall:
-#   docker run -d -p 127.0.0.1:8080:8080 --name e2e-services e2e-services:latest
-# Caddy's reverse_proxy target is then 127.0.0.1:8080.
+# The container listens on 8080. On the shared host it sits BEHIND Caddy and
+# publishes no port at all: onebox (x402-facilitator/onebox/apps/e2e.yml)
+# joins it to the `edge` network as `e2e`, and Caddy's reverse_proxy target is
+# e2e:8080. Every request goes through Caddy (TLS, headers, limits). To look
+# at the image on its own machine, loopback only:
+#   docker run --rm -p 127.0.0.1:8080:8080 end-to-end-services:onebox
 EXPOSE 8080
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
