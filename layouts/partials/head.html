@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 	<meta name="description" content="{{ .Params.description | default .Params.summary }}"> 
-	<meta name="author" content="{{ .Site.Params.author | default .Site.Author.name }}">  
+	<meta name="author" content="{{ .Site.Params.author.name }}">  
 
     <!-- <base href="{{ .Site.BaseURL }}"> -->
     <title>{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }} – {{ .Site.Title }}{{ end }}</title>
@@ -24,7 +24,9 @@
     <!-- Custom CSS -->
     <link href="/css/custom.css" rel="stylesheet">
 
-    <script defer data-domain="end-to-end-services.github.io" src="https://plausible.io/js/script.js"></script>
+    {{ with .Site.Params.plausibleDomain }}
+    <script defer data-domain="{{ . }}" src="https://plausible.io/js/script.js"></script>
+    {{ end }}
 
 </head>
 <body class="d-flex flex-column h-100">
